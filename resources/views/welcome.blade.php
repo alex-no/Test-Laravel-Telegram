@@ -269,6 +269,10 @@
                 </div>
             </main>
         </div>
+        <div class="flex flex-col items-center justify-center mt-8">
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white">Welcome to Our Application</h1>
+            <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">This is a test page from Olexandr Nosov.</p>
+        </div>    
 
         @if (Route::has('login'))
             <div class="h-14.5 hidden lg:block"></div>
