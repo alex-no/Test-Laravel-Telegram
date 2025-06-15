@@ -43,8 +43,7 @@ return [
      */
     'bots' => [
         'default' => [
-            //'token' => env('TELEGRAM_BOT_TOKEN', 'YOUR-BOT-TOKEN'),
-            'token' => env('7620315733:AAFTbsgK-BoxZS41s4g-zEdWKQFZRppxxbA', 'YOUR-BOT-TOKEN'),
+            'token' => env('TELEGRAM_BOT_TOKEN', 'YOUR-BOT-TOKEN'),
 
             'commands' => [
                 // 'start' => App\Telegram\Commands\Start::class,
