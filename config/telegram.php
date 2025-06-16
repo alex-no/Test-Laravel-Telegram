@@ -46,15 +46,17 @@ return [
             'token' => env('TELEGRAM_BOT_TOKEN', 'YOUR-BOT-TOKEN'),
 
             'commands' => [
-                // 'start' => App\Telegram\Commands\Start::class,
+                'start' => App\Telegram\Commands\Start::class,
             ],
 
             'listen' => [
                 'update' => [],
                 'webhook.failed' => [],
 
-                // Example of various events fired.
-                'message' => [],
+              // Example of various events fired.
+                'message' => [
+                    // App\Telegram\Listeners\HandleIncomingMessage::class
+                ],
                 'poll' => [],
                 'message.left_chat_member' => [],
                 'inline_query.location' => [],
