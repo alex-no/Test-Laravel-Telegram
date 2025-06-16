@@ -6,37 +6,42 @@ use App\Http\Controllers\Controller;
 use Telegram\Bot\Api;
 use Illuminate\Http\Request;
 use App\Models\TelegramUser;
+use Illuminate\Support\Facades\Log;
 
 class WebhookController extends Controller
 {
     public function handle(Request $request)
     {
+Log::info('raw request body: ' . $request->getContent());
         $telegram = app(Api::class);
         $update = $telegram->getWebhookUpdate();
-        $message = $update->getMessage();
+Log::info('class of $update: ' . get_class($update));
+Log::info('raw $update: ' . print_r($update, true));
+        $message = $update->get('message');
+Log::info('ok-4');
 
         if (!$message) {
             return response()->noContent();
         }
 
-        $chatId = $message->getChat()->getId();
-        $firstName = $message->getFrom()->getFirstName();
-        $userData = $message->getFrom();
-        $text = trim($message->getText());
+        $chatId    = $message['chat']['id'] ?? null;
+        $firstName = $message['from']['first_name'] ?? '';
+        $text      = trim($message['text']);
 
+Log::info('ok-5 [' . $text . ']');
         if ($text === '/start') {
             TelegramUser::updateOrCreate(
                 ['telegram_id' => $chatId],
                 [
-                    'first_name'     => $userData->getFirstName(),
-                    'last_name'      => $userData->getLastName(),
-                    'username'       => $userData->getUsername(),
-                    'language_code'  => $userData->getLanguageCode(),
-                    'is_bot'         => $userData->getIsBot(),
-                    'is_premium'     => $userData->get('is_premium') ?? false,
+                    'first_name'     => $message['from']['first_name'] ?? null,
+                    'last_name'      => $message['from']['last_name'] ?? null,
+                    'username'       => $message['from']['username'] ?? null,
+                    'language_code'  => $message['from']['language_code'] ?? null,
+                    'is_bot'         => $message['from']['is_bot'] ?? false,
+                    'is_premium'     => $message['from']['is_premium'] ?? false,
                     'extra'          => [
-                        'supports_inline_queries'  => $userData->get('supports_inline_queries'),
-                        'added_to_attachment_menu' => $userData->get('added_to_attachment_menu'),
+                        'supports_inline_queries'  => $message['from']['supports_inline_queries'] ?? null,
+                        'added_to_attachment_menu' => $message['from']['added_to_attachment_menu'] ?? null,
                     ],
                 ]
             );
