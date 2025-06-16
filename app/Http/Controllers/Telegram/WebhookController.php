@@ -12,13 +12,9 @@ class WebhookController extends Controller
 {
     public function handle(Request $request)
     {
-Log::info('raw request body: ' . $request->getContent());
         $telegram = app(Api::class);
         $update = $telegram->getWebhookUpdate();
-Log::info('class of $update: ' . get_class($update));
-Log::info('raw $update: ' . print_r($update, true));
         $message = $update->get('message');
-Log::info('ok-4');
 
         if (!$message) {
             return response()->noContent();
@@ -28,7 +24,6 @@ Log::info('ok-4');
         $firstName = $message['from']['first_name'] ?? '';
         $text      = trim($message['text']);
 
-Log::info('ok-5 [' . $text . ']');
         if ($text === '/start') {
             TelegramUser::updateOrCreate(
                 ['telegram_id' => $chatId],
