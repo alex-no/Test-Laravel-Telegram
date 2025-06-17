@@ -19,14 +19,14 @@ class TaskCreateStepHandler implements StepHandlerInterface
         $data = $state->data ?? [];
 
         switch ($step) {
-            case 'ask_title':
-                $this->telegram->sendMessage([
-                    'chat_id' => $chatId,
-                    'text' => '📌 Введите заголовок новой задачи:',
-                ]);
-                $state->step = 'save_title';
-                $state->save();
-                return;
+            // case 'ask_title':
+            //     $this->telegram->sendMessage([
+            //         'chat_id' => $chatId,
+            //         'text' => '📌 Введите заголовок новой задачи:',
+            //     ]);
+            //     $state->step = 'save_title';
+            //     $state->save();
+            //     return;
 
             case 'save_title':
                 if (mb_strlen($text) < 3) {

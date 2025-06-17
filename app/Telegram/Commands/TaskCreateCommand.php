@@ -33,7 +33,7 @@ class TaskCreateCommand implements TelegramCommandHandler
         // Create new state
         $state = new TelegramUserState();
         $state->telegram_user_id = $user->id;
-        $state->step = 'ask_title'; // 👈 first step
+        $state->step = 'save_title'; // 👈 first step
         $state->data = [];
         $state->save();
 
