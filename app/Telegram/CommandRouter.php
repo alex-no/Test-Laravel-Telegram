@@ -10,9 +10,9 @@ class CommandRouter
     protected const COMMAND_MAIN_HANDLERS = [
         'start' => \App\Telegram\Commands\StartCommand::class,
         'help'  => \App\Telegram\Commands\HelpCommand::class,
+        'newtask'  => \App\Telegram\Commands\TaskCreateCommand::class,
         'tasks'    => \App\Telegram\Commands\TaskListCommand::class,
         'task'     => \App\Telegram\Commands\TaskViewCommand::class,
-        'newtask'  => \App\Telegram\Commands\TaskCreateCommand::class,
         'search'   => \App\Telegram\Commands\TaskSearchCommand::class,
     ];
     protected const STEP_HANDLERS = [

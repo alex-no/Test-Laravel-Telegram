@@ -3,6 +3,7 @@ namespace App\Telegram\Commands;
 
 use App\Models\TelegramUser;
 use Telegram\Bot\Api;
+use App\Models\TelegramTask;
 
 class TaskListCommand implements TelegramCommandHandler
 {
@@ -23,9 +24,32 @@ class TaskListCommand implements TelegramCommandHandler
      */
     public function handle(array $message, string $dataText, TelegramUser $user): void
     {
+        $chatId = $user->telegram_id;
+
+        // Get the user's latest 10 tasks (pagination can be added later)
+        $tasks = $user->tasks()->latest()->take(10)->get();
+
+        if ($tasks->isEmpty()) {
+            $this->telegram->sendMessage([
+                'chat_id' => $chatId,
+                'text' => '📭 У вас пока нет задач.',
+            ]);
+            return;
+        }
+
+        $text = "📋 *Ваши задачи:*\n\n";
+        foreach ($tasks as $task) {
+            $text .= "• *{$task->title}*";
+            if ($task->description) {
+                $text .= "\n  _{$task->description}_";
+            }
+            $text .= "\n\n";
+        }
+
         $this->telegram->sendMessage([
-            'chat_id' => $user->telegram_id,
-            'text' => __('messages.welcome') . '.',
+            'chat_id' => $chatId,
+            'text' => $text,
+            'parse_mode' => 'Markdown',
         ]);
     }
 }
