@@ -23,7 +23,7 @@ class WebhookController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\Response
      */
-    public function handle(Request $request): Response
+    public function __invoke(Request $request): Response
     {
         $telegram = app(Api::class);
         $update = $telegram->getWebhookUpdate();
@@ -34,23 +34,9 @@ class WebhookController extends Controller
         }
 
         $telegramUser = TelegramUser::getUser($message);
-        $text      = trim($message['text']);
+        $this->setUserLanguage($telegramUser);
 
-        $lang = $this->setUserLanguage($telegramUser);
-// Log::info("Telegram user {$telegramUser->telegram_id} set language to {$lang}");
-
-        if ($text === '/start') {
-            $telegram->sendMessage([
-                'chat_id' => $telegramUser->telegram_id,
-                'text' => __('messages.welcome') . ", {$telegramUser->first_name}! 👋\n" . __('messages.successful_command') . '.',
-            ]);
-        } elseif ($text === '/help') {
-            $telegram->sendMessage([
-                'chat_id' => $telegramUser->telegram_id,
-                'text' => __('messages.commands') . ":\n" .
-                    "/start — " . __('messages.register') . "\n" .
-                    "/help — " . __('messages.help'),            ]);
-        }
+        app(\App\Telegram\CommandRouter::class)->handle($message, $telegramUser);
 
         return response()->noContent();
     }
