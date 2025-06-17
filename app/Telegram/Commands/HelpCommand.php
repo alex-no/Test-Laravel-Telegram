@@ -13,10 +13,10 @@ class HelpCommand implements TelegramCommandHandler
         '/start'   => 'messages.register',
         '/help'    => 'messages.help',
         '/tasks'   => 'messages.tasks_list',
-        '/task'    => 'messages.task_edit',
+        '/task id'    => 'messages.task_edit',
         '/newtask' => 'messages.task_create',
-        '/search'  => 'messages.task_search',
-        'password:....' => 'messages.password_set',
+        '/search text'  => 'messages.task_search',
+        'password:...' => 'messages.password_set',
     ];
     /**
      * Constructor for the HelpCommand.

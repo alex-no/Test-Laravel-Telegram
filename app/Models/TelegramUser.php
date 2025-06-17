@@ -4,9 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class TelegramUser extends Model
 {
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
     protected $fillable = [
         'telegram_id',
         'first_name',
@@ -18,6 +25,11 @@ class TelegramUser extends Model
         'extra',
     ];
 
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array<string, string>
+     */
     protected $casts = [
         'telegram_id' => 'integer',
         'is_bot' => 'boolean',
@@ -26,6 +38,9 @@ class TelegramUser extends Model
         'extra' => 'array', // Store arbitrary data as JSON
     ];
 
+    /**
+     * Create or update a Telegram user based on the message payload.
+     */
     public static function getUser(array $message): self
     {
         // Check for chat.id presence
@@ -63,4 +78,25 @@ class TelegramUser extends Model
 
         return $user;
     }
+
+    /**
+     * Get the Telegram user's tasks.
+     *
+     * @return HasMany
+     */
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(TelegramTask::class, 'telegram_user_id');
+    }
+
+    /**
+     * Get the Telegram user's state.
+     *
+     * @return HasOne
+     */
+    public function state(): HasOne
+    {
+        return $this->hasOne(TelegramUserState::class, 'telegram_user_id');
+    }
+
 }
