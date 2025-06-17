@@ -7,6 +7,7 @@ use Telegram\Bot\Api;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\TelegramUser;
+use App\Telegram\CommandRouter;
 // use Illuminate\Support\Facades\Log;
 
 class WebhookController extends Controller
@@ -36,7 +37,7 @@ class WebhookController extends Controller
         $telegramUser = TelegramUser::getUser($message);
         $this->setUserLanguage($telegramUser);
 
-        app(\App\Telegram\CommandRouter::class)->handle($message, $telegramUser);
+        app(CommandRouter::class)->handle($message, $telegramUser);
 
         return response()->noContent();
     }

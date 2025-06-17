@@ -35,12 +35,12 @@ class CommandRouter
 
         if (preg_match('/^\/(\w+)$/', $text, $matches)) {
             if (isset(self::COMMAND_MAIN_HANDLERS[$matches[1]])) {
-                $command = self::COMMAND_MAIN_HANDLERS[$matches[1]];
+                $command = self::COMMAND_MAIN_HANDLERS[$matches[1]] ?? null;
             }
         } elseif (preg_match('/^(\w+)\:(.+)$/', $text, $matches)) {
             if (isset(self::COMMAND_ADD_HANDLERS[$matches[1]])) {
-            $command = self::COMMAND_ADD_HANDLERS[$matches[1]];
-            $dataText = $matches[2];
+            $command = self::COMMAND_ADD_HANDLERS[$matches[1]] ?? null;
+            $dataText = $matches[2] ?? '';
             }
         }
 
