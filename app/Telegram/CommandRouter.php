@@ -15,6 +15,12 @@ class CommandRouter
         'newtask'  => \App\Telegram\Commands\TaskCreateCommand::class,
         'search'   => \App\Telegram\Commands\TaskSearchCommand::class,
     ];
+    protected const STEP_HANDLERS = [
+        'ask_title'        => \App\Telegram\Steps\TaskCreateStepHandler::class,
+        'save_title'       => \App\Telegram\Steps\TaskCreateStepHandler::class,
+        'save_description' => \App\Telegram\Steps\TaskCreateStepHandler::class,
+        // other steps from other dialogs can be added here
+    ];
     protected const COMMAND_ADD_HANDLERS = [
         'password' => \App\Telegram\Commands\PasswordCommand::class,
     ];
@@ -23,7 +29,9 @@ class CommandRouter
      * Main command handlers.
      * @var Telegram\Bot\Api $telegram
      */
-    public function __construct(protected Api $telegram) {}
+    public function __construct(
+        protected Api $telegram
+    ) {}
 
     /**
      * Handle incoming messages and route them to the appropriate command handler.
@@ -36,6 +44,15 @@ class CommandRouter
         $text    = strtolower(trim($message['text']));
         $dataText = '';
         $command = null;
+
+        // ✅ Universal step handler
+        $step = $user->state?->step;
+        if ($step && isset(self::STEP_HANDLERS[$step])) {
+            /** @var StepHandlerInterface $handler */
+            $handler = app(self::STEP_HANDLERS[$step]);
+            $handler->handleStep($step, $text, $user);
+            return;
+        }
 
         // /command or /command param
         if (preg_match('/^\/(\w+)(?:\s+(.*))?$/', $text, $matches)) {

@@ -27,73 +27,20 @@ class TaskCreateCommand implements TelegramCommandHandler
      */
     public function handle(array $message, string $dataText, TelegramUser $user): void
     {
-        $chatId = $user->telegram_id;
-        $text = trim($message['text'] ?? '');
+        // Reset previous state if needed
+        $user->state()?->delete();
 
-        // Get or create the user's state
-        $state = $user->state()->firstOrCreate([
-            'telegram_user_id' => $user->id,
+        // Create new state
+        $state = new TelegramUserState();
+        $state->telegram_user_id = $user->id;
+        $state->step = 'ask_title'; // 👈 first step
+        $state->data = [];
+        $state->save();
+
+        // Send the first question to the user
+        $this->telegram->sendMessage([
+            'chat_id' => $user->telegram_id,
+            'text' => '📌 Введите заголовок новой задачи:',
         ]);
-
-        $step = $state->step ?? 'ask_title';
-        $data = $state->data ?? [];
-
-        switch ($step) {
-            case 'ask_title':
-                $this->telegram->sendMessage([
-                    'chat_id' => $chatId,
-                    'text' => '📌 Введите заголовок новой задачи:',
-                ]);
-                $state->step = 'save_title';
-                $state->save();
-                return;
-
-            case 'save_title':
-                if (mb_strlen($text) < 3) {
-                    $this->telegram->sendMessage([
-                        'chat_id' => $chatId,
-                        'text' => '❗ Заголовок слишком короткий. Попробуйте ещё раз:',
-                    ]);
-                    return;
-                }
-
-                $data['title'] = $text;
-
-                $this->telegram->sendMessage([
-                    'chat_id' => $chatId,
-                    'text' => '📝 Теперь введите описание задачи (или отправьте "-" для пропуска):',
-                ]);
-                $state->step = 'save_description';
-                $state->data = $data;
-                $state->save();
-                return;
-
-            case 'save_description':
-                $data['description'] = ($text === '-') ? null : $text;
-
-                $task = new TelegramTask([
-                    'title'       => $data['title'],
-                    'description' => $data['description'],
-                ]);
-                $user->tasks()->save($task);
-
-                $state->delete(); // clear the state
-
-                $this->telegram->sendMessage([
-                    'chat_id' => $chatId,
-                    'text' => "✅ Задача создана!\n\n*{$task->title}*" .
-                              ($task->description ? "\n📝 {$task->description}" : ''),
-                    'parse_mode' => 'Markdown',
-                ]);
-                return;
-
-            default:
-                $this->telegram->sendMessage([
-                    'chat_id' => $chatId,
-                    'text' => '⚠️ Произошла ошибка. Попробуйте начать сначала.',
-                ]);
-                $state->delete();
-                return;
-        }
     }
 }
