@@ -16,4 +16,5 @@ return [
 
     'tasks_not_found' => 'You have no tasks yet',
     'your_tasks' => 'Your tasks',
+    'edit' => 'Edit',
 ];
