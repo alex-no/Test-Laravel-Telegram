@@ -10,6 +10,10 @@ class CommandRouter
     protected const COMMAND_MAIN_HANDLERS = [
         'start' => \App\Telegram\Commands\StartCommand::class,
         'help'  => \App\Telegram\Commands\HelpCommand::class,
+        'tasks'    => \App\Telegram\Commands\TaskListCommand::class,
+        'task'     => \App\Telegram\Commands\TaskViewCommand::class,
+        'newtask'  => \App\Telegram\Commands\TaskCreateCommand::class,
+        'search'   => \App\Telegram\Commands\TaskSearchCommand::class,
     ];
     protected const COMMAND_ADD_HANDLERS = [
         'password' => \App\Telegram\Commands\PasswordCommand::class,
@@ -33,14 +37,20 @@ class CommandRouter
         $dataText = '';
         $command = null;
 
-        if (preg_match('/^\/(\w+)$/', $text, $matches)) {
-            if (isset(self::COMMAND_MAIN_HANDLERS[$matches[1]])) {
-                $command = self::COMMAND_MAIN_HANDLERS[$matches[1]] ?? null;
-            }
-        } elseif (preg_match('/^(\w+)\:(.+)$/', $text, $matches)) {
-            if (isset(self::COMMAND_ADD_HANDLERS[$matches[1]])) {
-            $command = self::COMMAND_ADD_HANDLERS[$matches[1]] ?? null;
+        // /command or /command param
+        if (preg_match('/^\/(\w+)(?:\s+(.*))?$/', $text, $matches)) {
+            $cmd = $matches[1];
             $dataText = $matches[2] ?? '';
+            if (isset(self::COMMAND_MAIN_HANDLERS[$cmd])) {
+                $command = self::COMMAND_MAIN_HANDLERS[$cmd];
+            }
+        }
+        // command:param (without slash)
+        elseif (preg_match('/^(\w+):(.+)$/', $text, $matches)) {
+            $cmd = $matches[1];
+            $dataText = $matches[2];
+            if (isset(self::COMMAND_ADD_HANDLERS[$cmd])) {
+                $command = self::COMMAND_ADD_HANDLERS[$cmd];
             }
         }
 

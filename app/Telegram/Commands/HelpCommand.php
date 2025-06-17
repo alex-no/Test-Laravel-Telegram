@@ -7,6 +7,18 @@ use Telegram\Bot\Api;
 class HelpCommand implements TelegramCommandHandler
 {
     /**
+     * Список поддерживаемых команд и их описания.
+     */
+    public const COMMAND_LIST = [
+        '/start'   => 'messages.register',
+        '/help'    => 'messages.help',
+        '/tasks'   => 'messages.tasks_list',
+        '/task'    => 'messages.task_edit',
+        '/newtask' => 'messages.task_create',
+        '/search'  => 'messages.task_search',
+        'password:....' => 'messages.password_set',
+    ];
+    /**
      * Constructor for the HelpCommand.
      * @param Api $telegram The Telegram API instance.
      */
@@ -26,9 +38,9 @@ class HelpCommand implements TelegramCommandHandler
         $this->telegram->sendMessage([
             'chat_id' => $user->telegram_id,
             'text' => __('messages.commands') . ":\n" .
-                "/start — " . __('messages.register') . "\n" .
-                "/help — " . __('messages.help') . "\n" .
-                "password:.... — " . __('messages.password_set'),
+                collect(self::COMMAND_LIST)
+                    ->map(fn($desc, $cmd) => $cmd . ' — ' . __($desc))
+                    ->implode("\n"),
         ]);
     }
 }
