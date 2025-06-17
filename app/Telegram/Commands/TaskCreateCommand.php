@@ -40,7 +40,7 @@ class TaskCreateCommand implements TelegramCommandHandler
         // Send the first question to the user
         $this->telegram->sendMessage([
             'chat_id' => $user->telegram_id,
-            'text' => '📌 Введите заголовок новой задачи:',
+            'text' => '📌 ' . __('dialogs.enter_headline') . ':',
         ]);
     }
 }

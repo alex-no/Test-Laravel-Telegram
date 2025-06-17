@@ -12,9 +12,9 @@ class HelpCommand implements TelegramCommandHandler
     public const COMMAND_LIST = [
         '/start'   => 'messages.register',
         '/help'    => 'messages.help',
+        '/newtask' => 'messages.task_create',
         '/tasks'   => 'messages.tasks_list',
         '/task id'    => 'messages.task_edit',
-        '/newtask' => 'messages.task_create',
         '/search text'  => 'messages.task_search',
         'password:...' => 'messages.password_set',
     ];

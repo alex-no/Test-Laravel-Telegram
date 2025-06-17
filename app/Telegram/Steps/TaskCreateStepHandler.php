@@ -22,17 +22,19 @@ class TaskCreateStepHandler implements StepHandlerInterface
             // case 'ask_title':
             //     $this->telegram->sendMessage([
             //         'chat_id' => $chatId,
-            //         'text' => '📌 Введите заголовок новой задачи:',
+            //         'text' => '📌 ' . __('dialogs.enter_headline') . ':',
             //     ]);
             //     $state->step = 'save_title';
             //     $state->save();
             //     return;
 
             case 'save_title':
-                if (mb_strlen($text) < 3) {
+                $clean = preg_replace('/[^\p{L}\p{N}]/u', '', $text);
+
+                if (mb_strlen($clean, 'UTF-8') < 3) {
                     $this->telegram->sendMessage([
                         'chat_id' => $chatId,
-                        'text' => '❗ Заголовок слишком короткий. Попробуйте ещё раз:',
+                        'text' => '❗ ' . __('dialogs.headline_too_short') . ':',
                     ]);
                     return;
                 }
@@ -41,7 +43,7 @@ class TaskCreateStepHandler implements StepHandlerInterface
 
                 $this->telegram->sendMessage([
                     'chat_id' => $chatId,
-                    'text' => '📝 Теперь введите описание задачи (или "-" для пропуска):',
+                    'text' => '📝 ' . __('dialogs.enter_description') . ':',
                 ]);
                 $state->step = 'save_description';
                 $state->data = $data;
@@ -60,7 +62,7 @@ class TaskCreateStepHandler implements StepHandlerInterface
 
                 $this->telegram->sendMessage([
                     'chat_id' => $chatId,
-                    'text' => "✅ Задача создана!\n\n*{$task->title}*" .
+                    'text' => '✅ ' . __('dialogs.task_created') . "!\n\n*{$task->title}*" .
                               ($task->description ? "\n📝 {$task->description}" : ''),
                     'parse_mode' => 'Markdown',
                 ]);
@@ -69,7 +71,7 @@ class TaskCreateStepHandler implements StepHandlerInterface
             default:
                 $this->telegram->sendMessage([
                     'chat_id' => $chatId,
-                    'text' => '⚠️ Неизвестный шаг. Попробуйте ещё раз /newtask.',
+                    'text' => '⚠️ ' . __('dialogs.unknown_step') . ' /newtask.',
                 ]);
                 $state->delete();
         }
