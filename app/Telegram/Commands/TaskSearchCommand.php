@@ -1,32 +1,24 @@
 <?php
+
 namespace App\Telegram\Commands;
 
 use App\Models\TelegramUser;
-use Telegram\Bot\Api;
 
-class TaskSearchCommand implements TelegramCommandHandler
+class TaskSearchCommand extends AbstractTaskListCommand
 {
-    /**
-     * Constructor for the TaskSearchCommand.
-     * @param Api $telegram The Telegram API instance.
-     */
-    public function __construct(
-        protected Api $telegram
-    ) {}
-
-    /**
-     * Handle the /start command.
-     * @param array $message The message data.
-     * @param string $dataText The text data.
-     * @param TelegramUser $user The user object.
-     * @return void
-     */
-    public function handle(array $message, string $dataText, TelegramUser $user): void
+    protected function getTasks(TelegramUser $user, string $dataText)
     {
-        $this->telegram->sendMessage([
-            'chat_id' => $user->telegram_id,
-            'text' => __('messages.welcome') . '.',
-        ]);
+        if (trim($dataText) === '') {
+            return collect(); // Empty query — do not search anything
+        }
+
+        return $user->tasks()
+            ->where(function ($query) use ($dataText) {
+                $query->where('title', 'ILIKE', "%$dataText%")
+                      ->orWhere('description', 'ILIKE', "%$dataText%");
+            })
+            ->latest()
+            ->take(20)
+            ->get();
     }
 }
-
