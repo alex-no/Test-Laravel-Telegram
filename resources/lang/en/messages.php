@@ -18,6 +18,7 @@ return [
 
     'tasks_not_found' => 'You have no tasks yet',
     'your_tasks' => 'Your tasks',
+    'search_results_for' => 'Search results for',
     'edit' => 'Edit',
     'view_detail' => 'View detail',
 

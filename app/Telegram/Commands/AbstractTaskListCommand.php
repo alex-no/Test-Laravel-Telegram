@@ -35,6 +35,18 @@ abstract class AbstractTaskListCommand implements TelegramCommandHandler
     abstract protected function getTasks(TelegramUser $user, string $dataText): Collection;
 
     /**
+     * Returns the header text for the task list.
+     * This method can be overridden in subclasses to provide a custom header.
+     *
+     * @param string $dataText
+     * @return string
+     */
+    protected function getHeader(string $dataText): string
+    {
+        return '📋 *' . __('messages.your_tasks') . ":*";
+    }
+
+    /**
      * Handles the incoming message and retrieves tasks for the user.
      * This method sends a list of tasks to the user based on the provided data text.
      *
@@ -62,7 +74,7 @@ abstract class AbstractTaskListCommand implements TelegramCommandHandler
         // Send the list header
         $this->telegram->sendMessage([
             'chat_id' => $chatId,
-            'text' => '📋 *' . __('messages.your_tasks') . ":*",
+            'text' => $this->getHeader($dataText),
             'parse_mode' => 'Markdown',
         ]);
 

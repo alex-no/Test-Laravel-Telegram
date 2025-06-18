@@ -18,6 +18,7 @@ return [
 
     'tasks_not_found' => 'У вас пока нет задач',
     'your_tasks' => 'Ваши задачи',
+    'search_results_for' => 'Результаты поиска по',
     'edit' => 'Редактировать',
     'view_detail' => 'Просмотреть детали',
 

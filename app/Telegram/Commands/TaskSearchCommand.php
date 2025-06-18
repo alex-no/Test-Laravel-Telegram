@@ -36,4 +36,15 @@ class TaskSearchCommand extends AbstractTaskListCommand
             ->take(20)
             ->get();
     }
+
+    /**
+     * Returns the header text for the search results.
+     * This method can be overridden in subclasses to provide a custom header.
+     * @param string $dataText
+     * @return string
+     */
+    protected function getHeader(string $dataText): string
+    {
+        return '🔍 *' . __('messages.search_results_for') . "*: _" . trim($dataText) . '_';
+    }
 }
