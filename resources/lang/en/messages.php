@@ -19,7 +19,7 @@ return [
     'tasks_not_found' => 'You have no tasks yet',
     'your_tasks' => 'Your tasks',
     'edit' => 'Edit',
-    'view' => 'View',
+    'view_detail' => 'View detail',
 
     'invalid_task_id' => 'Invalid task ID. Please enter the ID and try again.',
     'task_not_found' => 'Task not found. Please check the ID and try again.',
