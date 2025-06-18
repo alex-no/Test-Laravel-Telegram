@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Log;
 
 class TelegramUser extends Model
 {
@@ -43,6 +44,12 @@ class TelegramUser extends Model
      */
     public static function getUser(array $message): self
     {
+        // Validate that the message contains the necessary chat information
+        if (!isset($message['chat']['id'])) {
+            Log::error('Missing chat.id in message payload', ['message' => $message]);
+            throw new \InvalidArgumentException('Missing chat.id in message payload');
+        }
+
         // Check for chat.id presence
         $telegramId = $message['chat']['id'] ?? null;
         if (!$telegramId) {

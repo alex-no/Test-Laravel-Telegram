@@ -8,14 +8,14 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\TelegramUser;
 use App\Telegram\CommandRouter;
-// use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Log;
 
 class WebhookController extends Controller
 {
     /**
      * Supported languages for the bot.
      * @var array
-    */
+     */
     const LANGUAGES = ['en', 'uk', 'ru'];
 
     /**
@@ -26,18 +26,32 @@ class WebhookController extends Controller
      */
     public function __invoke(Request $request): Response
     {
-        $telegram = app(Api::class);
-        $update = $telegram->getWebhookUpdate();
-        $message = $update->get('message');
+        $update = $request->all();
+        $wrapper = new \App\Telegram\TelegramMessageWrapper($update);
 
-        if (!$message) {
+        $text = $wrapper->getText();
+        $message = $wrapper->getMessage();
+
+        if (!$text || !$message) {
+            Log::warning('No message text found');
             return response()->noContent();
         }
 
-        $telegramUser = TelegramUser::getUser($message);
+        $message['text'] = $text;
+
+        $telegramUser = TelegramUser::getUser($wrapper->getMessage());
         $this->setUserLanguage($telegramUser);
 
         app(CommandRouter::class)->handle($message, $telegramUser);
+
+        // Respond to callback if needed
+        if ($wrapper->isCallback()) {
+            app(Api::class)->answerCallbackQuery([
+                'callback_query_id' => $wrapper->getCallbackQueryId(),
+                'text' => '⏱️ ' . __('messages.performed') . '...',
+                'show_alert' => false,
+            ]);
+        }
 
         return response()->noContent();
     }

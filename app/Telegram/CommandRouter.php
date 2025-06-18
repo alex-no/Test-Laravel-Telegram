@@ -4,6 +4,7 @@ namespace App\Telegram;
 use App\Models\TelegramUser;
 use Telegram\Bot\Api;
 use App\Telegram\Commands\TelegramCommandHandler;
+// use Illuminate\Support\Facades\Log;
 
 class CommandRouter
 {
@@ -63,7 +64,7 @@ class CommandRouter
         }
 
         // /command or /command param
-        if (preg_match('/^\/(\w+)(?:\s+(.*))?$/', $text, $matches)) {
+        if (preg_match('/^\/?(\w+)(?:\s+(.*))?$/', $text, $matches)) {
             $cmd = $matches[1];
             $dataText = $matches[2] ?? '';
             if (isset(self::COMMAND_MAIN_HANDLERS[$cmd])) {
@@ -71,7 +72,7 @@ class CommandRouter
             }
         }
         // command:param (without slash)
-        elseif (preg_match('/^(\w+):(.+)$/', $text, $matches)) {
+        elseif (preg_match('/^\/?([\w\.]+):(.+)$/', $text, $matches)) {
             $cmd = $matches[1];
             $dataText = $matches[2];
             if (isset(self::COMMAND_ADD_HANDLERS[$cmd])) {

@@ -1,5 +1,7 @@
 <?php
 return [
+    'performed' => 'Performed',
+
     'welcome' => 'Welcome',
     'successful_command' => 'Registration was successful',
     'commands' => 'Available commands',

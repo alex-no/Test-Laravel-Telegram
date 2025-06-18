@@ -58,9 +58,9 @@ class TaskViewCommand implements TelegramCommandHandler
             'parse_mode' => 'Markdown',
             'reply_markup' => [
                 'inline_keyboard' => [[
-                    ['text' => '✏', 'callback_data' => "/task.edit.title {$task->id}"],
-                    ['text' => '📝', 'callback_data' => "/task.edit.desc {$task->id}"],
-                    ['text' => '🗑', 'callback_data' => "/task.delete {$task->id}"],
+                    ['text' => '✏', 'callback_data' => "/task.edit.title:{$task->id}"],
+                    ['text' => '📝', 'callback_data' => "/task.edit.desc:{$task->id}"],
+                    ['text' => '🗑', 'callback_data' => "/task.delete:{$task->id}"],
                 ]]
             ],
         ]);
