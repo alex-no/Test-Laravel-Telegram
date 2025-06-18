@@ -63,7 +63,7 @@ class TaskListCommand implements TelegramCommandHandler
                 'reply_markup' => [
                     'inline_keyboard' => [[
                         [
-                            'text' => '🔧 ' . __('messages.edit'),
+                            'text' => '👁 ' . __('messages.view'),
                             'callback_data' => "/task {$task->id}"
                         ]
                     ]]

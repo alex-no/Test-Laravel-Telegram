@@ -8,10 +8,23 @@ use Telegram\Bot\Api;
 
 class TaskCreateStepHandler implements StepHandlerInterface
 {
+    /**
+     * Constructor for the TaskCreateStepHandler.
+     *
+     * @param Api $telegram The Telegram API instance.
+     */
     public function __construct(
         protected Api $telegram
     ) {}
 
+    /**
+     * Handle the task creation steps.
+     *
+     * @param string $step The current step in the task creation process.
+     * @param string $text The text input from the user.
+     * @param TelegramUser $user The user object.
+     * @return void
+     */
     public function handleStep(string $step, string $text, TelegramUser $user): void
     {
         $chatId = $user->telegram_id;

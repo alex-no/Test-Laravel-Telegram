@@ -19,10 +19,18 @@ class CommandRouter
         'ask_title'        => \App\Telegram\Steps\TaskCreateStepHandler::class,
         'save_title'       => \App\Telegram\Steps\TaskCreateStepHandler::class,
         'save_description' => \App\Telegram\Steps\TaskCreateStepHandler::class,
+
+        'task_edit_title' => \App\Telegram\Steps\TaskEditStepHandler::class,
+        'task_edit_desc' => \App\Telegram\Steps\TaskEditStepHandler::class,
+        'task_delete_confirm' => \App\Telegram\Steps\TaskEditStepHandler::class,
         // other steps from other dialogs can be added here
     ];
     protected const COMMAND_ADD_HANDLERS = [
         'password' => \App\Telegram\Commands\PasswordCommand::class,
+
+        'task.edit.title' => \App\Telegram\Commands\TaskEditTitleCommand::class,
+        'task.edit.desc'  => \App\Telegram\Commands\TaskEditDescriptionCommand::class,
+        'task.delete'     => \App\Telegram\Commands\TaskDeleteCommand::class,
     ];
 
     /**
