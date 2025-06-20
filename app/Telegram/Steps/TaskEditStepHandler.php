@@ -26,12 +26,13 @@ class TaskEditStepHandler implements StepHandlerInterface
      * @param TelegramUser $user The user object.
      * @return void
      */
-    public function handleStep(string $step, string $text, TelegramUser $user): void
+    public function handleStep(string $step, TelegramUser $user, array $message): void
     {
         $chatId = $user->telegram_id;
         $state = $user->state()->firstOrCreate(['telegram_user_id' => $user->id]);
         $data = $state->data ?? [];
         $taskId = $data['task_id'] ?? null;
+        $text = $message['text'] ?? '';
 
         switch ($step) {
             case 'task_edit_title':
@@ -83,7 +84,6 @@ class TaskEditStepHandler implements StepHandlerInterface
             default:
                 $this->sendMessage($chatId, __('dialogs.unknown_step'));
                 break;
-
         }
     }
 

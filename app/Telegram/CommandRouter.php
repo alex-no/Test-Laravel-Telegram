@@ -50,18 +50,18 @@ class CommandRouter
      */
     public function handle(array $message, TelegramUser $user): void
     {
-        $text    = strtolower(trim($message['text']));
-        $dataText = '';
-        $command = null;
-
         // ✅ Universal step handler
         $step = $user->state?->step;
         if ($step && isset(self::STEP_HANDLERS[$step])) {
             /** @var StepHandlerInterface $handler */
             $handler = app(self::STEP_HANDLERS[$step]);
-            $handler->handleStep($step, $text, $user);
+            $handler->handleStep($step, $user, $message);
             return;
         }
+
+        $text    = strtolower(trim($message['text']));
+        $dataText = '';
+        $command = null;
 
         // /command or /command param
         if (preg_match('/^\/?(\w+)(?:\s+(.*))?$/', $text, $matches)) {
