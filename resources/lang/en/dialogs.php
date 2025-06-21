@@ -11,4 +11,8 @@ return [
     'confirm_task_deletion' => 'Are you sure you want to delete this task? Reply with "yes" to confirm or "no" to cancel.',
     'task_deleted' => 'Task deleted',
     'unknown_step' => 'Unknown step. Please try again',
+    'can_attach_files' => 'You can attach files to the task. When you are done, to finish type',
+    'files' => 'Files',
+    'file_attached' => 'File attached. More?',
+    'send_file_or_type' => 'Send a file or type',
 ];

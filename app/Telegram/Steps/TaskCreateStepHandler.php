@@ -3,7 +3,7 @@ namespace App\Telegram\Steps;
 
 use App\Models\TelegramTask;
 use App\Models\TelegramUser;
-//use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Log;
 use Telegram\Bot\Api;
 
 class TaskCreateStepHandler implements StepHandlerInterface
@@ -30,18 +30,10 @@ class TaskCreateStepHandler implements StepHandlerInterface
         $chatId = $user->telegram_id;
         $state = $user->state()->firstOrCreate(['telegram_user_id' => $user->id]);
         $data = $state->data ?? [];
-        $text = $message['text'] ?? '';
+        $text = strtolower(trim($message['text'] ?? ''));
 
+Log::info("TaskCreateStepHandler: Handling step '{$step}' for user {$user->id} with text: {$text}");
         switch ($step) {
-            // case 'ask_title':
-            //     $this->telegram->sendMessage([
-            //         'chat_id' => $chatId,
-            //         'text' => '📌 ' . __('dialogs.enter_headline') . ':',
-            //     ]);
-            //     $state->step = 'save_title';
-            //     $state->save();
-            //     return;
-
             case 'save_title':
                 $clean = preg_replace('/[^\p{L}\p{N}]/u', '', $text);
 
@@ -72,12 +64,12 @@ class TaskCreateStepHandler implements StepHandlerInterface
 
                 $this->telegram->sendMessage([
                     'chat_id' => $chatId,
-                    'text' => '📎 Ви можете прикріпити файли до задачі. Коли завершите, напишіть "готово".',
+                    'text' => '📎 ' . __('dialogs.can_attach_files') . ' "ready".',
                 ]);
                 return;
 
             case 'wait_files':
-                if (mb_strtolower(trim($text)) === 'готово') {
+                if (mb_strtolower(trim($text)) === 'ready') {
                     $task = new TelegramTask([
                         'title' => $data['title'],
                         'description' => $data['description'],
@@ -97,7 +89,7 @@ class TaskCreateStepHandler implements StepHandlerInterface
                         'chat_id' => $chatId,
                         'text' => '✅ ' . __('dialogs.task_created') . "!\n\n*{$task->title}*"
                                 . ($task->description ? "\n📝 {$task->description}" : '')
-                                . (isset($data['files']) ? "\n📎 Файлів: " . count($data['files']) : ''),
+                                . (isset($data['files']) ? "\n📎 ' . __('dialogs.files') . ': " . count($data['files']) : ''),
                         'parse_mode' => 'Markdown',
                     ]);
                     return;
@@ -112,14 +104,14 @@ class TaskCreateStepHandler implements StepHandlerInterface
 
                     $this->telegram->sendMessage([
                         'chat_id' => $chatId,
-                        'text' => '✅ Файл прикріплено. Ще?',
+                        'text' => '✅ ' . __('dialogs.file_attached'),
                     ]);
                     return;
                 }
 
                 $this->telegram->sendMessage([
                     'chat_id' => $chatId,
-                    'text' => '📎 Надішліть файл або напишіть "готово".',
+                    'text' => '📎 ' . __('dialogs.send_file_or_type') . ' "ready".',
                 ]);
 
             default:

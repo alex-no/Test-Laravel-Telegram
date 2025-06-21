@@ -4,7 +4,7 @@ namespace App\Telegram;
 use App\Models\TelegramUser;
 use Telegram\Bot\Api;
 use App\Telegram\Commands\TelegramCommandHandler;
-// use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Log;
 
 class CommandRouter
 {
@@ -52,6 +52,7 @@ class CommandRouter
     {
         // ✅ Universal step handler
         $step = $user->state?->step;
+Log::info("TaskRouter: Step '{$step}' with text: {$message['text']}");
         if ($step && isset(self::STEP_HANDLERS[$step])) {
             /** @var StepHandlerInterface $handler */
             $handler = app(self::STEP_HANDLERS[$step]);
