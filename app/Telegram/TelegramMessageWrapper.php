@@ -78,6 +78,11 @@ class TelegramMessageWrapper
     public function hasMedia(): bool
     {
         $message = $this->getMessage();
-        return isset($message['document'], $message['photo'], $message['video'], $message['audio']);
+        return isset($message['document'])
+            || isset($message['photo'])
+            || isset($message['video'])
+            || isset($message['audio'])
+            || isset($message['voice'])
+            || isset($message['sticker']);
     }
 }

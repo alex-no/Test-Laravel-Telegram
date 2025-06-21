@@ -48,9 +48,9 @@ class WebhookController extends Controller
 
             app(CommandRouter::class)->handle($message, $telegramUser);
         } catch (\InvalidArgumentException $e) {
-            return $this->handleError($message, $e->getMessage());
+            return $this->handleError($e->getMessage(), $message);
         } catch (\Exception $e) {
-            return $this->handleError($message ?? '', $e->getMessage());
+            return $this->handleError($e->getMessage(), $message ?? []);
         }
 
         // Respond to callback if needed
@@ -82,7 +82,7 @@ class WebhookController extends Controller
         return $lang;
     }
 
-    private function handleError(array $message, string $errorMessage): Response
+    private function handleError(string $errorMessage, array $message): Response
     {
             Log::error('Error processing Telegram message', [
                 'message' => $message,
