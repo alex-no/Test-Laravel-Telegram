@@ -46,14 +46,13 @@ class TelegramUser extends Model
     {
         // Validate that the message contains the necessary chat information
         if (!isset($message['chat']['id'])) {
-            Log::error('Missing chat.id in message payload', ['message' => $message]);
             throw new \InvalidArgumentException('Missing chat.id in message payload');
         }
 
         // Check for chat.id presence
         $telegramId = $message['chat']['id'] ?? null;
         if (!$telegramId) {
-            throw new InvalidArgumentException('Missing chat.id in message payload');
+            throw new InvalidArgumentException('Empty chat.id in message payload');
         }
 
         // Try to find an existing user

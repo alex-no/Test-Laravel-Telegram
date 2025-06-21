@@ -70,4 +70,14 @@ class TelegramMessageWrapper
     {
         return $this->update['callback_query']['id'] ?? null;
     }
+
+    /**
+     * Check if the message has media.
+     * @return bool
+     */
+    public function hasMedia(): bool
+    {
+        $message = $this->getMessage();
+        return isset($message['document'], $message['photo'], $message['video'], $message['audio']);
+    }
 }

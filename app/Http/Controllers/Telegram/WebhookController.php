@@ -9,6 +9,7 @@ use Illuminate\Http\Response;
 use App\Models\TelegramUser;
 use App\Telegram\CommandRouter;
 use Illuminate\Support\Facades\Log;
+use App\Telegram\TelegramMessageWrapper;
 
 class WebhookController extends Controller
 {
@@ -27,22 +28,30 @@ class WebhookController extends Controller
     public function __invoke(Request $request): Response
     {
         $update = $request->all();
-        $wrapper = new \App\Telegram\TelegramMessageWrapper($update);
+        $wrapper = new TelegramMessageWrapper($update);
 
         $text = $wrapper->getText();
         $message = $wrapper->getMessage();
 
-        if (!$text || !$message) {
-            Log::warning('No message text found');
-            return response()->noContent();
+        try {
+            if (!$message) {
+                throw new \Exception('Empty Telegram message');
+            }
+            if (empty($text) && !$wrapper->hasMedia()) {
+                throw new \InvalidArgumentException('Message ignored: no text or media');
+            }
+
+            $telegramUser = TelegramUser::getUser($message);
+            $this->setUserLanguage($telegramUser);
+
+            $message['text'] = $text;
+
+            app(CommandRouter::class)->handle($message, $telegramUser);
+        } catch (\InvalidArgumentException $e) {
+            return $this->handleError($message, $e->getMessage());
+        } catch (\Exception $e) {
+            return $this->handleError($message ?? '', $e->getMessage());
         }
-
-        $message['text'] = $text;
-
-        $telegramUser = TelegramUser::getUser($wrapper->getMessage());
-        $this->setUserLanguage($telegramUser);
-
-        app(CommandRouter::class)->handle($message, $telegramUser);
 
         // Respond to callback if needed
         if ($wrapper->isCallback()) {
@@ -71,5 +80,14 @@ class WebhookController extends Controller
 
         app()->setLocale($lang);
         return $lang;
+    }
+
+    private function handleError(array $message, string $errorMessage): Response
+    {
+            Log::error('Error processing Telegram message', [
+                'message' => $message,
+                'error' => $errorMessage,
+            ]);
+            return response()->noContent();
     }
 }
