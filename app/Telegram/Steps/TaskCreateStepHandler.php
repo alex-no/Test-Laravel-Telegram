@@ -32,7 +32,6 @@ class TaskCreateStepHandler implements StepHandlerInterface
         $data = $state->data ?? [];
         $text = strtolower(trim($message['text'] ?? ''));
 
-Log::info("TaskCreateStepHandler: Handling step '{$step}' for user {$user->id} with text: {$text}");
         switch ($step) {
             case 'save_title':
                 $clean = preg_replace('/[^\p{L}\p{N}]/u', '', $text);
@@ -89,7 +88,7 @@ Log::info("TaskCreateStepHandler: Handling step '{$step}' for user {$user->id} w
                         'chat_id' => $chatId,
                         'text' => '✅ ' . __('dialogs.task_created') . "!\n\n*{$task->title}*"
                                 . ($task->description ? "\n📝 {$task->description}" : '')
-                                . (isset($data['files']) ? "\n📎 ' . __('dialogs.files') . ': " . count($data['files']) : ''),
+                                . (isset($data['files']) ? "\n📎 " . __('dialogs.files') . ': ' . count($data['files']) : ''),
                         'parse_mode' => 'Markdown',
                     ]);
                     return;
@@ -113,6 +112,7 @@ Log::info("TaskCreateStepHandler: Handling step '{$step}' for user {$user->id} w
                     'chat_id' => $chatId,
                     'text' => '📎 ' . __('dialogs.send_file_or_type') . ' "ready".',
                 ]);
+
 
             default:
                 $this->telegram->sendMessage([
