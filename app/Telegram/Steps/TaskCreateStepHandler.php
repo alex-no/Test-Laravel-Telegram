@@ -33,6 +33,36 @@ class TaskCreateStepHandler implements StepHandlerInterface
         $text = strtolower(trim($message['text'] ?? ''));
 
         switch ($step) {
+            case 'ask_task_target':
+                $answer = strtolower(trim($message['text']));
+                $data = $user->state->data ?? [];
+
+                if ($answer === __('dialogs.personally_me')) {
+                    $data['target'] = 'user';
+                } else {
+                    // search for the group by name
+                    $group = $user->groups()->where('title', $answer)->first();
+                    if (!$group) {
+                        $this->telegram->sendMessage([
+                            'chat_id' => $user->telegram_id,
+                            'text'    => __('dialogs.not_recognize_group'),
+                        ]);
+                        return;
+                    }
+                    $data['target'] = 'group:' . $group->id;
+                }
+
+                // Update the step
+                $user->state->step = 'save_title';
+                $user->state->data = $data;
+                $user->state->save();
+
+                $this->telegram->sendMessage([
+                    'chat_id' => $user->telegram_id,
+                    'text'    => '📌 ' . __('dialogs.enter_headline') . ':',
+                ]);
+                return;
+
             case 'save_title':
                 $clean = preg_replace('/[^\p{L}\p{N}]/u', '', $text);
 
@@ -73,7 +103,15 @@ class TaskCreateStepHandler implements StepHandlerInterface
                         'title' => $data['title'],
                         'description' => $data['description'],
                     ]);
-                    $user->tasks()->save($task);
+
+                    $target = $data['target'] ?? 'user';
+                    if (str_starts_with($target, 'group:')) {
+                        $groupId = (int)substr($target, 6);
+                        $task->telegram_group_id = $groupId;
+                        $task->save(); // save directly
+                    } else {
+                        $user->tasks()->save($task); // regular personal task
+                    }
 
                     // Attach deferred files from session or database
                     if (!empty($data['files'])) {

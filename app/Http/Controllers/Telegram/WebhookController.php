@@ -38,12 +38,16 @@ class WebhookController extends Controller
             if (!$message) {
                 throw new \Exception('Empty Telegram message');
             }
-            if (empty($text) && !$wrapper->hasMedia()) {
-                throw new \InvalidArgumentException('Message ignored: no text or media');
-            }
 
             // Automatically register group if applicable
             AutoGroupRegistrar::handle($message);
+
+            if (empty($text) && !$wrapper->hasMedia()) {
+                if (!empty($message['group_chat_created']) || !empty($message['new_chat_members'])) {
+                    return response()->noContent();
+                }
+                throw new \InvalidArgumentException('Message ignored: no text or media');
+            }
 
             $telegramUser = TelegramUser::getUser($message);
             $this->setUserLanguage($telegramUser);

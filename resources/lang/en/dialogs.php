@@ -1,6 +1,9 @@
 <?php
 return [
+    'personally_me' => 'Personally for me',
+    'for_whom_task' => 'For whom to create the task?',
     'enter_headline' => 'Enter the headline of the new task',
+    'not_recognize_group' => 'Could not recognize the group. Please try again.',
     'headline_too_short' => 'The headline is too short. Please try again',
     'enter_description' => 'Now enter the task description (or "-" to skip)',
     'task_created' => 'Task created',
