@@ -8,8 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\TelegramUser;
 use App\Telegram\CommandRouter;
-use Illuminate\Support\Facades\Log;
+use App\Telegram\Middleware\AutoGroupRegistrar;
 use App\Telegram\TelegramMessageWrapper;
+use Illuminate\Support\Facades\Log;
 
 class WebhookController extends Controller
 {
@@ -40,6 +41,9 @@ class WebhookController extends Controller
             if (empty($text) && !$wrapper->hasMedia()) {
                 throw new \InvalidArgumentException('Message ignored: no text or media');
             }
+
+            // Automatically register group if applicable
+            AutoGroupRegistrar::handle($message);
 
             $telegramUser = TelegramUser::getUser($message);
             $this->setUserLanguage($telegramUser);
