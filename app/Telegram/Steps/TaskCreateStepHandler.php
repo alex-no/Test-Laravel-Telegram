@@ -136,23 +136,41 @@ class TaskCreateStepHandler implements StepHandlerInterface
     {
         if (isset($message['document'])) {
             $file = $message['document'];
-        } elseif (isset($message['photo'])) {
-            // Take the largest photo by size
-            $file = end($message['photo']);
-        } elseif (isset($message['video'])) {
-            $file = $message['video'];
-        } else {
-            return null;
+            return [
+                'file_id' => $file['file_id'],
+                'file_unique_id' => $file['file_unique_id'],
+                'file_name' => $file['file_name'] ?? null,
+                'mime_type' => $file['mime_type'] ?? null,
+                'file_size' => $file['file_size'] ?? null,
+                'file_type' => 'document',
+            ];
         }
 
-        return [
-            'file_id' => $file['file_id'],
-            'file_unique_id' => $file['file_unique_id'],
-            'file_name' => $file['file_name'] ?? null,
-            'mime_type' => $file['mime_type'] ?? null,
-            'file_size' => $file['file_size'] ?? null,
-        ];
-    }
+        if (isset($message['photo'])) {
+            $file = end($message['photo']);
+            return [
+                'file_id' => $file['file_id'],
+                'file_unique_id' => $file['file_unique_id'],
+                'file_name' => null, // Photo files typically do not have a file name
+                'mime_type' => 'image/jpeg',
+                'file_size' => $file['file_size'] ?? null,
+                'file_type' => 'photo',
+            ];
+        }
 
+        if (isset($message['video'])) {
+            $file = $message['video'];
+            return [
+                'file_id' => $file['file_id'],
+                'file_unique_id' => $file['file_unique_id'],
+                'file_name' => $file['file_name'] ?? null,
+                'mime_type' => $file['mime_type'] ?? null,
+                'file_size' => $file['file_size'] ?? null,
+                'file_type' => 'video',
+            ];
+        }
+
+        return null;
+    }
 
 }

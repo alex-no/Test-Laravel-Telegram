@@ -28,15 +28,19 @@ class TaskFileSendCommand implements TelegramCommandHandler
 
         $sendData = [
             'chat_id' => $chatId,
-            'caption' => $file->file_name,
+            'caption' => $file->file_name ?? null,
         ];
 
-        if (str_starts_with($file->mime_type ?? '', 'image')) {
+        if (!empty($file->mime_type) && str_starts_with($file->mime_type, 'image')) {
             $sendData['photo'] = $file->file_id;
             $this->telegram->sendPhoto($sendData);
-        } elseif (str_starts_with($file->mime_type ?? '', 'video')) {
+        } elseif (!empty($file->mime_type) && str_starts_with($file->mime_type, 'video')) {
             $sendData['video'] = $file->file_id;
             $this->telegram->sendVideo($sendData);
+        } elseif (empty($file->mime_type) && empty($file->file_name)) {
+            // Most likely, this is an image without a mime type — send as photo
+            $sendData['photo'] = $file->file_id;
+            $this->telegram->sendPhoto($sendData);
         } else {
             $sendData['document'] = $file->file_id;
             $this->telegram->sendDocument($sendData);
