@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Support\Facades\Log;
+// use Illuminate\Support\Facades\Log;
 
 class TelegramUser extends Model
 {
@@ -28,7 +28,6 @@ class TelegramUser extends Model
 
     /**
      * The attributes that should be cast to native types.
-     *
      * @var array<string, string>
      */
     protected $casts = [
@@ -105,4 +104,13 @@ class TelegramUser extends Model
         return $this->hasOne(TelegramUserState::class, 'telegram_user_id');
     }
 
+    /**
+     * Get the Telegram groups that the user belongs to.
+     *
+     * @return BelongsToMany
+     */
+    public function groups()
+    {
+        return $this->belongsToMany(TelegramGroup::class, 'telegram_group_user');
+    }
 }
