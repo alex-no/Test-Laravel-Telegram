@@ -33,6 +33,7 @@ class CommandRouter
         'task.edit.title' => \App\Telegram\Commands\TaskEditTitleCommand::class,
         'task.edit.desc'  => \App\Telegram\Commands\TaskEditDescriptionCommand::class,
         'task.delete'     => \App\Telegram\Commands\TaskDeleteCommand::class,
+        'task.file'       => \App\Telegram\Commands\TaskFileSendCommand::class,
     ];
 
     /**

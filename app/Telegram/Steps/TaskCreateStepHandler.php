@@ -3,7 +3,7 @@ namespace App\Telegram\Steps;
 
 use App\Models\TelegramTask;
 use App\Models\TelegramUser;
-use Illuminate\Support\Facades\Log;
+// use Illuminate\Support\Facades\Log;
 use Telegram\Bot\Api;
 
 class TaskCreateStepHandler implements StepHandlerInterface
@@ -112,7 +112,7 @@ class TaskCreateStepHandler implements StepHandlerInterface
                     'chat_id' => $chatId,
                     'text' => '📎 ' . __('dialogs.send_file_or_type') . ' "ready".',
                 ]);
-
+                return;
 
             default:
                 $this->telegram->sendMessage([

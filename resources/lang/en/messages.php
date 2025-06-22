@@ -24,4 +24,5 @@ return [
 
     'invalid_task_id' => 'Invalid task ID. Please enter the ID and try again.',
     'task_not_found' => 'Task not found. Please check the ID and try again.',
+    'file_not_found_or_forbidden' => 'File not found or access forbidden. Please check the file ID and try again.',
 ];

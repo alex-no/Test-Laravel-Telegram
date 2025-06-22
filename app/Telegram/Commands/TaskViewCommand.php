@@ -2,9 +2,10 @@
 
 namespace App\Telegram\Commands;
 
-use App\Models\TelegramTask;
+// use App\Models\TelegramTask;
 use App\Models\TelegramUser;
 use Telegram\Bot\Api;
+use Illuminate\Support\Facades\Log;
 
 class TaskViewCommand implements TelegramCommandHandler
 {
@@ -36,7 +37,7 @@ class TaskViewCommand implements TelegramCommandHandler
             return;
         }
 
-        $task = $user->tasks()->find($taskId);
+        $task = $user->tasks()->with('files')->find($taskId);
         if (!$task) {
             $this->telegram->sendMessage([
                 'chat_id' => $chatId,
@@ -51,18 +52,50 @@ class TaskViewCommand implements TelegramCommandHandler
             $text .= "\n\n📝 {$task->description}";
         }
 
-        // Send with buttons
+        if ($task->files->isNotEmpty()) {
+            $text .= "\n\n📎 " . __('dialogs.attached_files') . ':';
+            foreach ($task->files as $file) {
+                $label = $file->file_name ?: __('dialogs.file');
+                $keyboard[] = [[
+                    'text' => "📎 {$label}",
+                    'callback_data' => "/task.file:{$file->id}",
+                ]];
+            }
+        }
+
+        // Create inline keyboard
+       $keyboard[] = [
+            ['text' => '✏', 'callback_data' => "/task.edit.title:{$task->id}"],
+            ['text' => '📝', 'callback_data' => "/task.edit.desc:{$task->id}"],
+            ['text' => '🗑', 'callback_data' => "/task.delete:{$task->id}"],
+        ];
+Log::debug('keyboard generated', $keyboard);
+
+
         $this->telegram->sendMessage([
             'chat_id' => $chatId,
             'text' => $text,
             'parse_mode' => 'Markdown',
-            'reply_markup' => [
-                'inline_keyboard' => [[
-                    ['text' => '✏', 'callback_data' => "/task.edit.title:{$task->id}"],
-                    ['text' => '📝', 'callback_data' => "/task.edit.desc:{$task->id}"],
-                    ['text' => '🗑', 'callback_data' => "/task.delete:{$task->id}"],
-                ]]
-            ],
+            'reply_markup' => ['inline_keyboard' => $keyboard],
         ]);
+
+        // Send files one by one
+        foreach ($task->files as $file) {
+            $sendData = [
+                'chat_id' => $chatId,
+                'caption' => $file->file_name ?? null,
+            ];
+
+            if (str_starts_with($file->mime_type ?? '', 'image')) {
+                $sendData['photo'] = $file->file_id;
+                $this->telegram->sendPhoto($sendData);
+            } elseif (str_starts_with($file->mime_type ?? '', 'video')) {
+                $sendData['video'] = $file->file_id;
+                $this->telegram->sendVideo($sendData);
+            } else {
+                $sendData['document'] = $file->file_id;
+                $this->telegram->sendDocument($sendData);
+            }
+        }
     }
 }

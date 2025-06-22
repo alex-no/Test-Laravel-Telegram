@@ -82,6 +82,13 @@ class WebhookController extends Controller
         return $lang;
     }
 
+    /**
+     * Handle errors during message processing.
+     * @param string $errorMessage error message
+     * @param array $message Bot message data array
+     * @return Response
+     * @throws \Exception
+     */
     private function handleError(string $errorMessage, array $message): Response
     {
             Log::error('Error processing Telegram message', [
