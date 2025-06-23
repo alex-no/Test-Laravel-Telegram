@@ -4,7 +4,7 @@ namespace App\Telegram;
 use App\Models\TelegramUser;
 use Telegram\Bot\Api;
 use App\Telegram\Commands\TelegramCommandHandler;
-use Illuminate\Support\Facades\Log;
+// use Illuminate\Support\Facades\Log;
 
 class CommandRouter
 {
