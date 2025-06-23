@@ -13,7 +13,7 @@ class TaskFileSendCommand implements TelegramCommandHandler
 
     public function handle(array $message, string $dataText, TelegramUser $user): void
     {
-        $chatId = $user->telegram_id;
+        $chatId = $message['chat']['id'];
 
         $fileId = (int) trim($dataText);
         $file = TelegramTaskFile::find($fileId);

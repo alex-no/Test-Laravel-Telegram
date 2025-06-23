@@ -27,12 +27,15 @@ class TaskEditDescriptionCommand implements TelegramCommandHandler
      */
     public function handle(array $message, string $dataText, TelegramUser $user): void
     {
+        // Get the chat ID from the message data
+        $chatId = $message['chat']['id'];
+
         $taskId = trim($dataText);
         $task = $user->tasks()->find($taskId);
 
         if (!$task) {
             $this->telegram->sendMessage([
-                'chat_id' => $user->telegram_id,
+                'chat_id' => $chatId,
                 'text' => __('messages.task_not_found'),
             ]);
             return;
@@ -45,7 +48,7 @@ class TaskEditDescriptionCommand implements TelegramCommandHandler
         $state->save();
 
         $this->telegram->sendMessage([
-            'chat_id' => $user->telegram_id,
+            'chat_id' => $chatId,
             'text' => __('dialogs.enter_new_description'),
         ]);
     }

@@ -53,7 +53,7 @@ class CommandRouter
     public function handle(array $message, TelegramUser $user): void
     {
         // ✅ Universal step handler
-        $step = $user->state?->step;
+        $step = $user->state()->first()?->step;
         if ($step && isset(self::STEP_HANDLERS[$step])) {
             /** @var StepHandlerInterface $handler */
             $handler = app(self::STEP_HANDLERS[$step]);
@@ -85,7 +85,7 @@ class CommandRouter
         if (!$command) {
             // If the command is not found, you can send an error message or ignore
             $this->telegram->sendMessage([
-                'chat_id' => $user->telegram_id,
+                'chat_id' => $message['chat']['id'] ?? $user->telegram_id,
                 'text' => __('messages.command_not_found'),
             ]);
             return;

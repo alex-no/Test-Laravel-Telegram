@@ -10,6 +10,11 @@ use Telegram\Bot\Api;
 class TaskEditStepHandler implements StepHandlerInterface
 {
     /**
+     * @var int|null
+     */
+    protected ?int $chatId = null;
+
+    /**
      * Constructor for the TaskCreateStepHandler.
      *
      * @param Api $telegram The Telegram API instance.
@@ -28,7 +33,7 @@ class TaskEditStepHandler implements StepHandlerInterface
      */
     public function handleStep(string $step, TelegramUser $user, array $message): void
     {
-        $chatId = $user->telegram_id;
+        $this->chatId = $message['chat']['id'] ?? $user->telegram_id;
         $state = $user->state()->firstOrCreate(['telegram_user_id' => $user->id]);
         $data = $state->data ?? [];
         $taskId = $data['task_id'] ?? null;
@@ -37,7 +42,7 @@ class TaskEditStepHandler implements StepHandlerInterface
         switch ($step) {
             case 'task_edit_title':
                 if (mb_strlen($text) < 3) {
-                    $this->sendMessage($chatId, __('dialogs.headline_too_short'));
+                    $this->sendMessage($this->chatId, __('dialogs.headline_too_short'));
                     return;
                 }
 
@@ -51,7 +56,7 @@ class TaskEditStepHandler implements StepHandlerInterface
                 $task->save();
 
                 $this->telegram->sendMessage([
-                    'chat_id' => $chatId,
+                    'chat_id' => $this->chatId,
                     'text' => __('dialogs.title_updated') . ': *' . $task->title . '*',
                     'parse_mode' => 'Markdown',
                 ]);
@@ -66,7 +71,7 @@ class TaskEditStepHandler implements StepHandlerInterface
                 $task->description = $text;
                 $task->save();
 
-                $this->sendMessage($chatId, __('dialogs.description_updated'));
+                $this->sendMessage($this->chatId, __('dialogs.description_updated'));
                 break;
 
             case 'task_delete_confirm':
@@ -78,11 +83,11 @@ class TaskEditStepHandler implements StepHandlerInterface
 
                 $task->delete();
 
-                $this->sendMessage($chatId, __('dialogs.task_deleted'));
+                $this->sendMessage($this->chatId, __('dialogs.task_deleted'));
                 break;
 
             default:
-                $this->sendMessage($chatId, __('dialogs.unknown_step'));
+                $this->sendMessage($this->chatId, __('dialogs.unknown_step'));
                 break;
         }
     }
@@ -96,16 +101,14 @@ class TaskEditStepHandler implements StepHandlerInterface
      */
     protected function getTaskById(TelegramUser $user, int|string|null $taskId): ?TelegramTask
     {
-        $chatId = $user->telegram_id;
-
         if (!$taskId || !is_numeric($taskId)) {
-            $this->sendMessage($chatId, __('messages.task_not_found'));
+            $this->sendMessage(__('messages.task_not_found'));
             return null;
         }
 
         $task = $user->tasks()->find($taskId);
         if (!$task) {
-            $this->sendMessage($chatId, __('messages.task_not_found'));
+            $this->sendMessage(__('messages.task_not_found'));
             return null;
         }
         return $task;
@@ -114,14 +117,14 @@ class TaskEditStepHandler implements StepHandlerInterface
     /**
      * Send a message to the user.
      *
-     * @param int $chatId The chat ID of the user.
+     * @param int $this->chatId The chat ID of the user.
      * @param string $text The text message to send.
      * @return void
      */
-    protected function sendMessage(int $chatId, string $text): void
+    protected function sendMessage(string $text): void
     {
         $this->telegram->sendMessage([
-            'chat_id' => $chatId,
+            'chat_id' => $this->chatId,
             'text' => $text,
         ]);
     }

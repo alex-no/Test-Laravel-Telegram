@@ -43,15 +43,15 @@ class TelegramUser extends Model
      */
     public static function getUser(array $message): self
     {
-        // Validate that the message contains the necessary chat information
-        if (!isset($message['chat']['id'])) {
-            throw new \InvalidArgumentException('Missing chat.id in message payload');
+        // Validate that the message contains the necessary from information
+        if (!isset($message['from']['id'])) {
+            throw new \InvalidArgumentException('Missing from.id in message payload');
         }
 
-        // Check for chat.id presence
-        $telegramId = $message['chat']['id'] ?? null;
+        // Check for from.id presence
+        $telegramId = $message['from']['id'] ?? null;
         if (!$telegramId) {
-            throw new InvalidArgumentException('Empty chat.id in message payload');
+            throw new InvalidArgumentException('Empty from.id in message payload');
         }
 
         // Try to find an existing user

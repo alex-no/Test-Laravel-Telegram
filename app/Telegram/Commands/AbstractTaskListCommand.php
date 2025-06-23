@@ -57,7 +57,7 @@ abstract class AbstractTaskListCommand implements TelegramCommandHandler
      */
     public function handle(array $message, string $dataText, TelegramUser $user): void
     {
-        $chatId = $user->telegram_id;
+        $chatId = $message['chat']['id'];
         $tasks = $this->getTasks($user, $dataText);
 
         if ($tasks->isEmpty()) {

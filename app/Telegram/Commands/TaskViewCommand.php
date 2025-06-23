@@ -26,7 +26,7 @@ class TaskViewCommand implements TelegramCommandHandler
      */
     public function handle(array $message, string $dataText, TelegramUser $user): void
     {
-        $chatId = $user->telegram_id;
+        $chatId = $message['chat']['id'];
 
         $taskId = (int) trim($dataText);
         if (!$taskId) {
@@ -69,7 +69,6 @@ class TaskViewCommand implements TelegramCommandHandler
             ['text' => '📝', 'callback_data' => "/task.edit.desc:{$task->id}"],
             ['text' => '🗑', 'callback_data' => "/task.delete:{$task->id}"],
         ];
-Log::debug('keyboard generated', $keyboard);
 
 
         $this->telegram->sendMessage([

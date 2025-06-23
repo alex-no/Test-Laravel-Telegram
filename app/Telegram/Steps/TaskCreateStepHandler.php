@@ -3,8 +3,8 @@ namespace App\Telegram\Steps;
 
 use App\Models\TelegramTask;
 use App\Models\TelegramUser;
-// use Illuminate\Support\Facades\Log;
 use Telegram\Bot\Api;
+// use Illuminate\Support\Facades\Log;
 
 class TaskCreateStepHandler implements StepHandlerInterface
 {
@@ -27,7 +27,7 @@ class TaskCreateStepHandler implements StepHandlerInterface
      */
     public function handleStep(string $step, TelegramUser $user, array $message): void
     {
-        $chatId = $user->telegram_id;
+        $chatId = $message['chat']['id'];
         $state = $user->state()->firstOrCreate(['telegram_user_id' => $user->id]);
         $data = $state->data ?? [];
         $text = strtolower(trim($message['text'] ?? ''));
@@ -37,19 +37,21 @@ class TaskCreateStepHandler implements StepHandlerInterface
                 $answer = strtolower(trim($message['text']));
                 $data = $user->state->data ?? [];
 
-                if ($answer === __('dialogs.personally_me')) {
+                if ($answer === strtolower(__('dialogs.personally_me'))) {
                     $data['target'] = 'user';
+                    unset($data['telegram_group_id']);
                 } else {
                     // search for the group by name
                     $group = $user->groups()->where('title', $answer)->first();
                     if (!$group) {
                         $this->telegram->sendMessage([
-                            'chat_id' => $user->telegram_id,
+                            'chat_id' => $chatId,
                             'text'    => __('dialogs.not_recognize_group'),
                         ]);
                         return;
                     }
                     $data['target'] = 'group:' . $group->id;
+                    $data['telegram_group_id'] = $group->id;
                 }
 
                 // Update the step
@@ -58,7 +60,7 @@ class TaskCreateStepHandler implements StepHandlerInterface
                 $user->state->save();
 
                 $this->telegram->sendMessage([
-                    'chat_id' => $user->telegram_id,
+                    'chat_id' => $chatId,
                     'text'    => '📌 ' . __('dialogs.enter_headline') . ':',
                 ]);
                 return;
@@ -102,16 +104,11 @@ class TaskCreateStepHandler implements StepHandlerInterface
                     $task = new TelegramTask([
                         'title' => $data['title'],
                         'description' => $data['description'],
+                        'telegram_group_id' => $data['telegram_group_id'] ?? null,
+                        'target' => $data['target'] ?? 'user',
                     ]);
 
-                    $target = $data['target'] ?? 'user';
-                    if (str_starts_with($target, 'group:')) {
-                        $groupId = (int)substr($target, 6);
-                        $task->telegram_group_id = $groupId;
-                        $task->save(); // save directly
-                    } else {
-                        $user->tasks()->save($task); // regular personal task
-                    }
+                    $user->tasks()->save($task);
 
                     // Attach deferred files from session or database
                     if (!empty($data['files'])) {

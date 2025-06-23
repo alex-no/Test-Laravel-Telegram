@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('telegram_tasks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('telegram_user_id')->constrained('telegram_users')->onDelete('cascade');
+            $table->foreignId('telegram_group_id')->constrained('telegram_groups')->onDelete('set null');
             $table->string('title');
             $table->text('description')->nullable();
             $table->enum('status', ['open', 'in_progress', 'done'])->default('open');

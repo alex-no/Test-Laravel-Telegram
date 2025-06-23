@@ -4,7 +4,7 @@ namespace App\Telegram\Middleware;
 
 use App\Models\TelegramGroup;
 use App\Models\TelegramUser;
-use Illuminate\Support\Facades\Log;
+// use Illuminate\Support\Facades\Log;
 
 class AutoGroupRegistrar
 {
@@ -15,7 +15,7 @@ class AutoGroupRegistrar
         }
 
         $chat = $message['chat'];
-        Log::info('AutoGroupRegistrar triggered', ['chat' => $chat]);
+        // Log::info('AutoGroupRegistrar triggered', ['chat' => $chat]);
 
         $group = TelegramGroup::firstOrCreate(
             ['telegram_chat_id' => $chat['id']],

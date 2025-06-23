@@ -36,7 +36,7 @@ class HelpCommand implements TelegramCommandHandler
     public function handle(array $message, string $dataText, TelegramUser $user): void
     {
         $this->telegram->sendMessage([
-            'chat_id' => $user->telegram_id,
+            'chat_id' => $message['chat']['id'],
             'text' => __('messages.commands') . ":\n" .
                 collect(self::COMMAND_LIST)
                     ->map(fn($desc, $cmd) => $cmd . ' — ' . __($desc))

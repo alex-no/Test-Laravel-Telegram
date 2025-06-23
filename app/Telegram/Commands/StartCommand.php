@@ -24,7 +24,7 @@ class StartCommand implements TelegramCommandHandler
     public function handle(array $message, string $dataText, TelegramUser $user): void
     {
         $this->telegram->sendMessage([
-            'chat_id' => $user->telegram_id,
+            'chat_id' => $message['chat']['id'],
             'text' => __('messages.welcome') . ", {$user->first_name}! 👋\n" . __('messages.successful_command') . '.',
         ]);
     }
