@@ -42,8 +42,9 @@ class TaskCreateStepHandler implements StepHandlerInterface
                     unset($data['telegram_group_id']);
                 } else {
                     // search for the group by name
-                    $group = $user->groups()->where('title', $answer)->first();
+                    $group = $user->groups->first(fn($g) => strtolower($g->title) === $answer);
                     if (!$group) {
+                        $user->state()?->delete();
                         $this->telegram->sendMessage([
                             'chat_id' => $chatId,
                             'text'    => __('dialogs.not_recognize_group'),
