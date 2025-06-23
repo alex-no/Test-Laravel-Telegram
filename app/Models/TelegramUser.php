@@ -43,13 +43,15 @@ class TelegramUser extends Model
      */
     public static function getUser(array $message): self
     {
+        $source = ($message['from']['is_bot'] ?? false) ? 'chat' : 'from';
+
         // Validate that the message contains the necessary from information
-        if (!isset($message['from']['id'])) {
+        if (!isset($message[$source]['id'])) {
             throw new \InvalidArgumentException('Missing from.id in message payload');
         }
 
         // Check for from.id presence
-        $telegramId = $message['from']['id'] ?? null;
+        $telegramId = $message[$source]['id'] ?? null;
         if (!$telegramId) {
             throw new InvalidArgumentException('Empty from.id in message payload');
         }
@@ -58,7 +60,7 @@ class TelegramUser extends Model
         $user = self::firstOrNew(['telegram_id' => $telegramId]);
 
         // Data source
-        $from = $message['from'] ?? [];
+        $from = $message[$source] ?? [];
 
         // Update only if not empty
         $user->first_name = $from['first_name'] ?? $user->first_name;
