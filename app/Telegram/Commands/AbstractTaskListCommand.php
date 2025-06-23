@@ -83,9 +83,16 @@ abstract class AbstractTaskListCommand implements TelegramCommandHandler
             $date = $dt->format($dateFormat);
             $time = $dt->format('H:i');
 
-            $text = "[{$date} {$time}] *{$task->title}*";
+            $isGroup = $task->telegram_group_id !== null;
+            $prefix = $isGroup ? '👥' : '👤';
+            $groupTitle = $isGroup ? optional($task->group)->title : '';
+
+            $text = "[{$date} {$time}] {$prefix} *{$task->title}*";
             if ($task->description) {
                 $text .= "\n_{$task->description}_";
+            }
+            if ($groupTitle) {
+                $text .= "\n📍 {$groupTitle}";
             }
 
             $this->telegram->sendMessage([
