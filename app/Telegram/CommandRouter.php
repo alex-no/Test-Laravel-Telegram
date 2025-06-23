@@ -4,7 +4,7 @@ namespace App\Telegram;
 use App\Models\TelegramUser;
 use Telegram\Bot\Api;
 use App\Telegram\Commands\TelegramCommandHandler;
-// use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Log;
 
 class CommandRouter
 {
@@ -17,6 +17,7 @@ class CommandRouter
         'search'   => \App\Telegram\Commands\TaskSearchCommand::class,
     ];
     protected const STEP_HANDLERS = [
+        'ask_task_target'  => \App\Telegram\Steps\TaskCreateStepHandler::class,
         'ask_title'        => \App\Telegram\Steps\TaskCreateStepHandler::class,
         'save_title'       => \App\Telegram\Steps\TaskCreateStepHandler::class,
         'save_description' => \App\Telegram\Steps\TaskCreateStepHandler::class,
